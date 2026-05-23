@@ -4,9 +4,7 @@
 pragma solidity ^0.8.0;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {
-    SafeERC20
-} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 // LinearVest is a contract that releases tokens to a recipient linearly over a specified period.
 // For example, if 100 tokens are vested over 100 days, the recipient will receive 1 token per day.
@@ -49,11 +47,7 @@ contract LinearVest {
     );
 
     event VestWithdrawn(
-        address indexed recipient,
-        bytes32 indexed vestId,
-        address token,
-        uint256 amount,
-        uint256 timestamp
+        address indexed recipient, bytes32 indexed vestId, address token, uint256 amount, uint256 timestamp
     );
 
     /*
@@ -79,14 +73,7 @@ contract LinearVest {
         require(address(token) != address(0), "bad token");
         require(startTime >= block.timestamp, "bad start");
 
-        bytes32 vestId = computeVestId(
-            token,
-            recipient,
-            amount,
-            startTime,
-            duration,
-            salt
-        );
+        bytes32 vestId = computeVestId(token, recipient, amount, startTime, duration, salt);
 
         require(vests[vestId].amount == 0, "already exists");
 
@@ -107,14 +94,7 @@ contract LinearVest {
 
         vestIds.push(vestId);
 
-        emit VestCreated(
-            msg.sender,
-            recipient,
-            address(token),
-            amount,
-            startTime,
-            duration
-        );
+        emit VestCreated(msg.sender, recipient, address(token), amount, startTime, duration);
     }
 
     /**
@@ -150,13 +130,7 @@ contract LinearVest {
 
         IERC20(vest.token).safeTransfer(msg.sender, toWithdraw);
 
-        emit VestWithdrawn(
-            msg.sender,
-            vestId,
-            vest.token,
-            toWithdraw,
-            block.timestamp
-        );
+        emit VestWithdrawn(msg.sender, vestId, vest.token, toWithdraw, block.timestamp);
     }
 
     /*
@@ -177,9 +151,6 @@ contract LinearVest {
         uint40 duration,
         uint256 salt
     ) public pure returns (bytes32) {
-        return
-            keccak256(
-                abi.encode(token, recipient, amount, startTime, duration, salt)
-            );
+        return keccak256(abi.encode(token, recipient, amount, startTime, duration, salt));
     }
 }
